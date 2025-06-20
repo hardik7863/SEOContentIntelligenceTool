@@ -1,1 +1,11 @@
 venv/
+__pycache__/
+*.pyc
+*.pkl
+*.pt
+*.so
+*.egg-info/
+.env
+venv/
+.DS_Store
+*.db
