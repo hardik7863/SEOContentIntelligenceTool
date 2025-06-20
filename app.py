@@ -2,26 +2,30 @@ import streamlit as st
 import requests
 from bs4 import BeautifulSoup
 import spacy
+import subprocess
+import importlib.util
 from keybert import KeyBERT
 from sentence_transformers import SentenceTransformer
 from urllib.parse import urlparse
 from textstat import flesch_reading_ease, flesch_kincaid_grade
 import pandas as pd
 from docx import Document
-import io
 import torch
 from transformers import AutoTokenizer, AutoModel
 
-# --- Safe KeyBERT model initialization (Fixes meta tensor issue) ---
+# --- Auto-download spaCy model for Streamlit Cloud ---
+model_name = "en_core_web_sm"
+if importlib.util.find_spec(model_name) is None:
+    subprocess.run(["python", "-m", "spacy", "download", model_name])
+
+# Load NLP and Embedding Models
+nlp = spacy.load(model_name)
+
 device = "cuda" if torch.cuda.is_available() else "cpu"
-model_name = "sentence-transformers/all-MiniLM-L6-v2"
-sentence_model = SentenceTransformer(model_name, device=device)
+sentence_model = SentenceTransformer("sentence-transformers/all-MiniLM-L6-v2", device=device)
 kw_model = KeyBERT(model=sentence_model)
 
-# Load spaCy
-nlp = spacy.load("en_core_web_sm")
-
-# --- Streamlit setup ---
+# --- Streamlit UI ---
 st.set_page_config(page_title="SEO Content Intelligence Tool", layout="wide")
 st.title("🔍 SEO Content Intelligence Tool")
 
@@ -70,10 +74,10 @@ def analyze_text(input_text):
     density_info = [(kw, round(word_list.count(kw.lower()) / len(word_list) * 100, 2)) for kw, _ in keywords]
     return keywords, density_info, entities, noun_chunks, meta_title, meta_description, reading_score, reading_grade
 
-# --- UI Tabs ---
+# --- Interface ---
 tab1, tab2 = st.tabs(["📝 Single Content Analysis", "⚔️ Competitor Comparison"])
 
-# --- Tab 1: Single Content ---
+# --- Tab 1 ---
 with tab1:
     st.subheader("Choose input method:")
     input_mode = st.radio("", ["Paste Text", "Enter URL", "Upload File"], horizontal=True)
@@ -137,7 +141,7 @@ with tab1:
         })
         st.download_button("⬇️ Download CSV", data=df.to_csv(index=False), file_name="seo_report.csv", mime="text/csv")
 
-# --- Tab 2: Competitor Comparison ---
+# --- Tab 2 ---
 with tab2:
     st.subheader("Enter URLs of two competitor blog/articles:")
 
@@ -175,6 +179,7 @@ with tab2:
             st.subheader("📌 Competitor B Top Keywords")
             st.markdown(", ".join([kw for kw, _ in data2[0]]))
 
+# --- Footer ---
 st.markdown(
     """
     <hr style="margin-top: 50px;">
