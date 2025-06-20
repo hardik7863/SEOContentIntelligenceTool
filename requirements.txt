@@ -1,0 +1,12 @@
+streamlit
+spacy
+beautifulsoup4
+requests
+keybert
+sentence-transformers
+textstat
+pandas
+python-docx
+fpdf
+transformers
+torch
