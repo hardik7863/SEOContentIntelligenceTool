@@ -6,8 +6,8 @@ An AI-powered web tool that analyzes blog articles or URLs to extract SEO-friend
 
 ## 🚀 Live Demo
 
-👉 [Click here to try the app](https://huggingface.co/spaces/your-username/seo-content-tool)  
-*(Replace with your actual Hugging Face / Render / Vercel link)*
+👉 [Click here to try the app](http://13.233.91.184:8501/)  
+*(Deployed On Amazon EC2)*
 
 ---
 
